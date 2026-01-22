@@ -27,7 +27,7 @@ pub fn blind<R: CryptoRng + RngCore, K: PublicKeyParts>(
     let mut r: BigUint;
     let unblinder;
     loop {
-        let mut bytes = [0u8; 32];
+        let mut bytes = vec![0u8; key.size()];
         rng.fill_bytes(&mut bytes);
         r = BigUint::from_bytes_be(&bytes) % key.n();
         if r.is_zero() {
@@ -64,15 +64,13 @@ pub fn unblind(key: &impl PublicKeyParts, m: &BigUint, unblinder: &BigUint) -> B
 ///
 /// # Arguments
 ///
-/// * `rng` - A cryptographically secure random number generator (optional)
 /// * `key` - The private key to use for decryption
 /// * `c` - The message to decrypt, as a BigUint
 ///
 /// # Returns
 ///
 /// The decrypted message as a BigUint, or an error if decryption failed
-pub fn rsa_decrypt_and_check<R: CryptoRng + RngCore>(
-    _rng: Option<&mut R>,
+pub fn rsa_decrypt_and_check(
     key: &RsaPrivateKey,
     c: &BigUint,
 ) -> Result<BigUint, rsa::errors::Error> {
